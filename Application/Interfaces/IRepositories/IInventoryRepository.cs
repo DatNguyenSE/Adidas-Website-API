@@ -5,6 +5,4 @@ namespace Adidas.Application.Interfaces.IRepositories;
 
 public interface IInventoryRepository : IGenericRepository<Inventory>
 {
-    Task<bool> UpdateInventoryAsync(int productId, int quantity);
-    Task<int> GetQuantityAsync(int productId);
 }

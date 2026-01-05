@@ -1,6 +1,7 @@
 using Adidas.Application.Dtos;
 using Adidas.Application.Interfaces;
 using Adidas.Application.Interfaces.IService;
+using Adidas.Domain.Exceptions;
 using API.Entities;
 using AutoMapper;
 
@@ -10,10 +11,16 @@ namespace Adidas.Application.Services
     {
         public async Task<ProductDto> AddAsync(CreateProductDto createDto)
         {
+            var errors = new List<string>();
+            
             var isDuplicate = await uow.ProductRepository.AnyAsync(p => p.Name == createDto.Name);
-            if (isDuplicate)
+            if (isDuplicate) errors.Add("Product name already exists.");
+
+            if( createDto.Price < 0) errors.Add("Price must be greater than or equal to 0.");
+
+            if (errors.Count > 0)
             {
-                throw new Exception("Product name already exists.");
+                throw new BadRequestException("Validation failed.", errors.ToArray());
             }
 
             var entity = mapper.Map<Product>(createDto);
@@ -30,14 +37,14 @@ namespace Adidas.Application.Services
             return mapper.Map<ProductDto>(entity);
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
             var result = await uow.ProductRepository.ChangeStatusProduct(id); // soft delete
-            if (result)
+            if (!result)
             {
-                await uow.Complete();
+                throw new NotFoundException($"Product with id {id} not found.");
             }
-            return result;
+            await uow.Complete();
         }
 
         public async Task<IEnumerable<ProductDto>> GetAllAsync()
@@ -49,11 +56,18 @@ namespace Adidas.Application.Services
         public async Task<ProductDto?> GetByIdAsync(int id)
         {
             var entity = await uow.ProductRepository.GetProductWithInventoryByIdAsync(id);
+            if (entity == null)
+            {
+               throw new NotFoundException($"Product with id {id} not found.");
+            }
             return mapper.Map<ProductDto>(entity);
         }
 
         public async Task<IEnumerable<ProductDto>> GetListByCategoryIdAsync(int categoryId)
         {
+        // Kiểm tra Category có tồn tại không trước (Optional - Good UX)
+        // var categoryExists = await uow.CategoryRepository.ExistsAsync(categoryId);
+        // if (!categoryExists) throw new NotFoundException($"Category {categoryId} not found.");
             var entities = await uow.ProductRepository.GetListByCategoryIdAsync(categoryId);
             return mapper.Map<IEnumerable<ProductDto>>(entities);
         }
@@ -63,7 +77,7 @@ namespace Adidas.Application.Services
             var existingProduct = await uow.ProductRepository.GetByIdAsync(id);
             if (existingProduct == null)
             {
-                return null;
+                throw new NotFoundException($"Product with id {id} not found.");
             }
             mapper.Map(productDto, existingProduct); // bo qua thuoc tinh thieu dto có mà entity k
             uow.ProductRepository.Update(existingProduct);

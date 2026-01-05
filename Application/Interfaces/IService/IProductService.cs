@@ -10,5 +10,5 @@ public interface IProductService
     Task<ProductDto> AddAsync(CreateProductDto createDto);
     Task<ProductDto?> UpdateAsync(int id, ProductDto productDto);
     Task<IEnumerable<ProductDto>> GetListByCategoryIdAsync(int categoryId);
-    Task<bool> DeleteAsync(int id);
+    Task DeleteAsync(int id);
 }

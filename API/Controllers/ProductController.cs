@@ -19,37 +19,24 @@ namespace API.Controllers
         public async Task<IActionResult> GetProductById(int productId)
         {
             var product = await productService.GetByIdAsync(productId);
-            if (product == null)
-            {
-                return NotFound(new { message = "The product does not exist." });
-            }
             return Ok(product);
         }
 
         [HttpPost]
         public async Task<ActionResult<ProductDto>> AddProduct(CreateProductDto productDto)
         {
-            try
-            {
-                var productAdded = await productService.AddAsync(productDto);
-                
-                return CreatedAtAction(nameof(GetProductById), new { productId = productAdded.Id }, productAdded);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+
+            var productAdded = await productService.AddAsync(productDto);
+
+            return CreatedAtAction(nameof(GetProductById), new { productId = productAdded.Id }, productAdded);
+
         }
 
         [HttpDelete("{productId:int}")]
         public async Task<IActionResult> DeleteProduct(int productId)
         {
-            var result = await productService.DeleteAsync(productId);
-            if (!result)
-            {
-                return NotFound(new { message = "The product does not exist." });
-            }
-            return Ok(new { message = "Product deleted successfully." });
+            await productService.DeleteAsync(productId);
+            return NoContent();
         }
     }
 }

@@ -14,6 +14,7 @@ using AutoMapper;
 using Adidas.Application.Services;
 using Adidas.Application.Mappings;
 using Adidas.Infrastructure.Data;
+using Adidas.API.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -90,7 +91,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 var app = builder.Build();
 
-
+app.UseMiddleware<ExceptionMiddleware>();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

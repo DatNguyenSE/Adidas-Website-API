@@ -12,21 +12,14 @@ namespace Adidas.API.Controllers
         [HttpPut("{productId:int}/update")]
         public async Task<ActionResult> UpdateInventory(int productId, int quantity)
         {
-            var result = await inventoryService.UpdateInventoryAsync(productId, quantity);
-            if (!result)
-            {
-                return BadRequest(new { message = "Error updating inventory." });
-            }
-            return Ok("Inventory updated successfully.");
+            await inventoryService.UpdateInventoryAsync(productId, quantity);
+            return Ok();
         }
+        
         [HttpGet("{productId:int}")]
         public async Task<ActionResult<InventoryDto>> GetInventory(int productId)
         {
             var inventory = await inventoryService.GetInventoryAsync(productId);
-            if (inventory == null)
-            {
-                return NotFound(new { message = "Inventory not found." });
-            }
             return Ok(inventory);
         }
         
@@ -34,15 +27,8 @@ namespace Adidas.API.Controllers
         [HttpGet("{productId:int}/quantity")]
         public async Task<ActionResult<int>> GetQuantity(int productId)
         {
-            try
-            {
-                var quantity = await inventoryService.GetQuantityAsync(productId);
-                return Ok(quantity);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message =  ex.Message });
-            }
+            var quantity = await inventoryService.GetQuantityAsync(productId);
+            return Ok(quantity);
         }
     }
 }

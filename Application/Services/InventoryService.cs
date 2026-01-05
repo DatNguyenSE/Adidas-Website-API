@@ -3,35 +3,40 @@ using Adidas.Application.Dtos;
 using Adidas.Application.Interfaces;
 using Adidas.Application.Interfaces.IRepositories;
 using Adidas.Application.Interfaces.IService;
+using Adidas.Domain.Exceptions;
 using AutoMapper;
 
 namespace Adidas.Application.Services;
 
 public class InventoryService(IUnitOfWork uow, IMapper mapper) : IInventoryService
 {
-    public async Task<bool> UpdateInventoryAsync(int productId, int quantity)
+    public async Task UpdateInventoryAsync(int productId, int quantity)
     {
-        var result = await uow.InventoryRepository.UpdateInventoryAsync(productId, quantity);
-        if (result)
+        if (quantity < 0)
         {
-            await uow.Complete();
+            throw new BadRequestException("Quantity cannot be negative.");
         }
-        return result;
+
+        var inventory = await uow.InventoryRepository.GetByIdAsync(productId) //ef core tracked entity
+            ?? throw new NotFoundException("Product not found."); 
+
+        inventory.Quantity = quantity;
+        inventory.UpdatedAt = DateTime.UtcNow;
+        await uow.Complete();
     }
 
     public async Task<InventoryDto?> GetInventoryAsync(int productId)
     {
-        var inventory =  await uow.InventoryRepository.GetByIdAsync(productId);
-        if (inventory == null)
-        {
-            return null;
-        }
+        var inventory =  await uow.InventoryRepository.GetByIdAsync(productId)
+            ?? throw new NotFoundException("Product not found.");
+         
         return mapper.Map<InventoryDto>(inventory);
     }
 
     public async Task<int> GetQuantityAsync(int productId)
     {
-        var inventory = await uow.InventoryRepository.GetByIdAsync(productId) ?? throw new Exception("Product not found.");
-        return await uow.InventoryRepository.GetQuantityAsync(productId);
+        var inventory = await uow.InventoryRepository.GetByIdAsync(productId) 
+            ?? throw new NotFoundException("Product not found.");
+        return inventory.Quantity;
     }
 }
