@@ -13,7 +13,7 @@ namespace Adidas.Application.Services;
 
 public class OrderService(IUnitOfWork uow, IMapper mapper, ILogger<OrderService> logger) : IOrderService
 {
-    public async Task<int> CreateOrderByCartItemsAsync(string userId, PaymentMethod paymentMethod)
+    public async Task<OrderDetailsDto> CreateOrderByCartItemsAsync(string userId, PaymentMethod paymentMethod)
     {
         // 1. Get user cart
         var userCart = await uow.CartRepository.GetCartByUserIdAsync(userId);
@@ -95,12 +95,14 @@ public class OrderService(IUnitOfWork uow, IMapper mapper, ILogger<OrderService>
 
         order.Status = OrderStatus.Placed;
 
+        
+
         // 6. Save changes
         await uow.OrderRepository.AddAsync(order);
         await uow.CartRepository.ClearCartAsync(userId);
         await uow.Complete(); // Commit transaction (Order + Inventory + Cart)
 
-        return order.Id;
+        return mapper.Map<OrderDetailsDto>(order);
     }
 
     public async Task<IEnumerable<OrderDto>> GetOrdersByUserIdAsync(string userId)

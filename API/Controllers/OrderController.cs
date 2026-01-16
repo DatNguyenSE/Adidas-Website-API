@@ -14,8 +14,8 @@ namespace Adidas.API.Controllers
         public async Task<IActionResult> CreateOrder(PaymentMethod paymentMethod)
         {
             var userId = User.GetUserId();
-            var orderId = await orderService.CreateOrderByCartItemsAsync(userId, paymentMethod);
-            return CreatedAtAction(nameof(GetOrderWithDetails), new { orderId = orderId }, orderId);
+            var order = await orderService.CreateOrderByCartItemsAsync(userId, paymentMethod);
+            return CreatedAtAction(nameof(GetOrderWithDetails), new { orderId = order.Id }, order);
         }
 
         [HttpGet("user-orders")]
