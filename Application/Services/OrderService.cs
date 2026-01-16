@@ -1,15 +1,15 @@
 using System;
-using Adidas.Application.Dtos;
-using Adidas.Application.Interfaces;
-using Adidas.Application.Interfaces.IService;
-using Adidas.Domain.Enums;
-using Adidas.Domain.Exceptions;
+using SportZone.Application.Dtos;
+using SportZone.Application.Interfaces;
+using SportZone.Application.Interfaces.IService;
+using SportZone.Domain.Enums;
+using SportZone.Domain.Exceptions;
 using API.Entities;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualBasic;
 
-namespace Adidas.Application.Services;
+namespace SportZone.Application.Services;
 
 public class OrderService(IUnitOfWork uow, IMapper mapper, ILogger<OrderService> logger) : IOrderService
 {

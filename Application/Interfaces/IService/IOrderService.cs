@@ -1,9 +1,9 @@
 using System;
-using Adidas.Application.Dtos;
-using Adidas.Domain.Enums;
+using SportZone.Application.Dtos;
+using SportZone.Domain.Enums;
 using API.Entities;
 
-namespace Adidas.Application.Interfaces.IService;
+namespace SportZone.Application.Interfaces.IService;
 
 public interface IOrderService
 {

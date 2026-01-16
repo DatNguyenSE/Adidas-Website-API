@@ -1,10 +1,10 @@
-using Adidas.API.Extensions;
-using Adidas.Application.Interfaces.IService;
-using Adidas.Domain.Enums;
+using SportZone.API.Extensions;
+using SportZone.Application.Interfaces.IService;
+using SportZone.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Adidas.API.Controllers
+namespace SportZone.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
